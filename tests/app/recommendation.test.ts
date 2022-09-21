@@ -1,6 +1,7 @@
 import agent from '../config/supertest'
 import { prisma } from '../../src/database'
 import recommendationFactory from '../recommendationFactory/recommendationFactory'
+import top5Factory from '../recommendationFactory/top5Factory'
 
 beforeEach(() => prisma.$queryRaw`TRUNCATE TABLE recommendations CASCADE`)
 
@@ -184,5 +185,19 @@ describe('GET /recommendations/:id', () => {
     const { status } = await agent.get(`/recommendations/${id}`)
 
     expect(status).toEqual(404)
+  })
+})
+
+describe('GET /recommendations/top/:amount', () => {
+  it('busca top 3', async () => {
+    const data = top5Factory()
+
+    const [top1, top2, top3] = await prisma.$transaction(
+      data.map(item => prisma.recommendation.create({ data: item }))
+    )
+
+    const { body } = await agent.get(`/recommendations/top/3`)
+
+    expect(body).toEqual([top1, top2, top3])
   })
 })
