@@ -3,7 +3,10 @@ import { prisma } from '../../src/database'
 import recommendationFactory from '../recommendationFactory/recommendationFactory'
 import top5Factory from '../recommendationFactory/top5Factory'
 
-beforeEach(() => prisma.$queryRaw`TRUNCATE TABLE recommendations CASCADE`)
+beforeEach(
+  () =>
+    prisma.$queryRaw`TRUNCATE TABLE recommendations RESTART IDENTITY CASCADE`
+)
 
 afterAll(async () => await prisma.$disconnect())
 
