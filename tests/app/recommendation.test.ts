@@ -140,7 +140,7 @@ describe('POST /recommendations/:id/downvote', () => {
 })
 
 describe('GET /recommendations', () => {
-  it('criar recomendação com dados válidos', async () => {
+  it('buscar recomendações existente', async () => {
     const data = recommendationFactory()
 
     await agent.post('/recommendations').send(data)
@@ -148,5 +148,41 @@ describe('GET /recommendations', () => {
     const { body } = await agent.get('/recommendations')
 
     expect(body).toBeInstanceOf(Array)
+  })
+})
+
+describe('GET /recommendations/:id', () => {
+  it('buscar recomendação com id válido', async () => {
+    const data = recommendationFactory()
+
+    await agent.post('/recommendations').send(data)
+
+    const recommendation = await prisma.recommendation.findUnique({
+      where: { name: data.name }
+    })
+
+    const { body, status } = await agent.get(
+      `/recommendations/${recommendation.id}`
+    )
+
+    expect(status).toEqual(200)
+
+    expect(body).toEqual(recommendation)
+  })
+
+  it('buscar recomendação com id inválido', async () => {
+    const data = recommendationFactory()
+
+    await agent.post('/recommendations').send(data)
+
+    let { id } = await prisma.recommendation.findUnique({
+      where: { name: data.name }
+    })
+
+    id++
+
+    const { status } = await agent.get(`/recommendations/${id}`)
+
+    expect(status).toEqual(404)
   })
 })
