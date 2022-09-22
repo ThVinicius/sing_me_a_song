@@ -4,4 +4,8 @@ function resetDatabase() {
   return testsRepository.resetDatabase()
 }
 
-export default { resetDatabase }
+function getRecommendationByName(name: string) {
+  return testsRepository.getRecommendationByName(name)
+}
+
+export default { resetDatabase, getRecommendationByName }

@@ -3,6 +3,11 @@ import testsController from '../controllers/testsController.js'
 
 const route = Router()
 
-route.post('/reset-database', testsController.resetDatabase)
+route.post('/tests/reset', testsController.resetDatabase)
+
+route.get(
+  '/tests/recommendations/name',
+  testsController.getRecommendationByName
+)
 
 export default route

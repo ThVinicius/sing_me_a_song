@@ -7,4 +7,12 @@ async function resetDatabase(_: Request, res: Response) {
   return res.sendStatus(200)
 }
 
-export default { resetDatabase }
+async function getRecommendationByName(req: Request, res: Response) {
+  const { name } = req.body as { name: string }
+
+  const recommendation = await testsService.getRecommendationByName(name)
+
+  return res.status(200).send(recommendation)
+}
+
+export default { resetDatabase, getRecommendationByName }
