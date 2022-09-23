@@ -1,8 +1,11 @@
-export default function findRecommendationFactory() {
+export default function findRecommendationFactory(
+  score: number = 0,
+  id: number = 0
+) {
   return {
-    id: 1,
+    id,
     name: 'teste',
     youtubeLink: 'https://google.com',
-    score: 0
+    score
   }
 }

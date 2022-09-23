@@ -2,6 +2,7 @@ import { recommendationService } from '../../src/services/recommendationsService
 import { recommendationRepository } from '../../src/repositories/recommendationRepository'
 import findRecommendationFactory from '../recommendationFactory/findRecommendationFactory'
 import recommendationFactory from '../recommendationFactory/recommendationFactory'
+import recommendations from '../recommendationFactory/recommendationsFactory'
 
 describe('testando a função insert', () => {
   it('testando sem conflito', async () => {
@@ -31,7 +32,7 @@ describe('testando a função insert', () => {
 
     const promise = recommendationService.insert(recommendation)
 
-    expect(promise).rejects.toEqual({
+    return expect(promise).rejects.toEqual({
       type: 'conflict',
       message: 'Recommendations names must be unique'
     })
@@ -66,7 +67,7 @@ describe('testando a função upvote', () => {
 
     const promise = recommendationService.upvote(id)
 
-    expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
+    return expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
   })
 })
 
@@ -98,7 +99,7 @@ describe('testando a função downvote', () => {
 
     const promise = recommendationService.downvote(id)
 
-    expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
+    return expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
   })
 
   it('testando com score abaixo de -5', async () => {
@@ -138,7 +139,7 @@ describe('testes da função get', () => {
 
     const result = await recommendationService.get()
 
-    expect(result).toEqual(findRecommendation)
+    return expect(result).toEqual(findRecommendation)
   })
 })
 
@@ -154,6 +155,163 @@ describe('testes da função getTop', () => {
 
     const result = await recommendationService.getTop(amount)
 
-    expect(result).toEqual(findRecommendation)
+    return expect(result).toEqual(findRecommendation)
+  })
+})
+
+describe('testes da função getRandom', () => {
+  it('retornando uma recomendação com score maior que 10', async () => {
+    const score1 = 12
+    const score2 = 0
+
+    const expectRecommendations = recommendations.expectRecommendations(score1)
+
+    const fillersRecommendations =
+      recommendations.fillersRecommendations(score2)
+
+    const allRecommendations = [
+      ...fillersRecommendations,
+      ...expectRecommendations
+    ]
+
+    const mathRandomValue = 0.5
+
+    const filterRecommentations = () => {
+      if (mathRandomValue < 0.7) {
+        return allRecommendations.filter(item => item.score > 10)
+      }
+
+      return allRecommendations.filter(item => item.score <= 10)
+    }
+
+    jest.spyOn(Math, 'random').mockReturnValueOnce(mathRandomValue)
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(filterRecommentations())
+
+    const result = await recommendationService.getRandom()
+
+    return expect(expectRecommendations).toContain(result)
+  })
+
+  it('retornando uma recomendação com score menor ou igual a 10', async () => {
+    const score1 = 0
+    const score2 = 12
+
+    const expectRecommendations = recommendations.expectRecommendations(score1)
+
+    const fillersRecommendations =
+      recommendations.fillersRecommendations(score2)
+
+    const allRecommendations = [
+      ...fillersRecommendations,
+      ...expectRecommendations
+    ]
+
+    const mathRandomValue = 0.8
+
+    const filterRecommentations = () => {
+      if (mathRandomValue < 0.7) {
+        return allRecommendations.filter(item => item.score > 10)
+      }
+
+      return allRecommendations.filter(item => item.score <= 10)
+    }
+
+    jest.spyOn(Math, 'random').mockReturnValueOnce(mathRandomValue)
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(filterRecommentations())
+
+    const result = await recommendationService.getRandom()
+
+    return expect(expectRecommendations).toContain(result)
+  })
+
+  it('nenhuma recomendação cadastrada', () => {
+    const allRecommendations = []
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(allRecommendations)
+      .mockResolvedValueOnce(allRecommendations)
+
+    const promise = recommendationService.getRandom()
+
+    return expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
+  })
+
+  it('mathRandom abaixo de 0.7 e nenhuma recomendação acima de 10', async () => {
+    const score1 = 0
+    const score2 = 2
+
+    const expectRecommendations = recommendations.expectRecommendations(score1)
+
+    const fillersRecommendations =
+      recommendations.fillersRecommendations(score2)
+
+    const allRecommendations = [
+      ...fillersRecommendations,
+      ...expectRecommendations
+    ]
+
+    const mathRandomValue = 0.5
+
+    const filterRecommentations = () => {
+      if (mathRandomValue < 0.7) {
+        return allRecommendations.filter(item => item.score > 10)
+      }
+
+      return allRecommendations.filter(item => item.score <= 10)
+    }
+
+    jest.spyOn(Math, 'random').mockReturnValueOnce(mathRandomValue)
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(filterRecommentations())
+      .mockResolvedValueOnce(allRecommendations)
+
+    const { score } = await recommendationService.getRandom()
+
+    return expect(score).toBeLessThan(10)
+  })
+
+  it('mathRandom maior ou igual a 0.7 e nenhuma recomendação abaixo de 10', async () => {
+    const score1 = 11
+    const score2 = 13
+
+    const expectRecommendations = recommendations.expectRecommendations(score1)
+
+    const fillersRecommendations =
+      recommendations.fillersRecommendations(score2)
+
+    const allRecommendations = [
+      ...fillersRecommendations,
+      ...expectRecommendations
+    ]
+
+    const mathRandomValue = 0.9
+
+    const filterRecommentations = () => {
+      if (mathRandomValue < 0.7) {
+        return allRecommendations.filter(item => item.score > 10)
+      }
+
+      return allRecommendations.filter(item => item.score <= 10)
+    }
+
+    jest.spyOn(Math, 'random').mockReturnValueOnce(mathRandomValue)
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(filterRecommentations())
+      .mockResolvedValueOnce(allRecommendations)
+
+    const { score } = await recommendationService.getRandom()
+
+    return expect(score).toBeGreaterThanOrEqual(10)
   })
 })
