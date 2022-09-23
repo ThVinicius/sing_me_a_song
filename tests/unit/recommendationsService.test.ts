@@ -1,12 +1,11 @@
 import { recommendationService } from '../../src/services/recommendationsService'
 import { recommendationRepository } from '../../src/repositories/recommendationRepository'
+import findRecommendationFactory from '../recommendationFactory/findRecommendationFactory'
+import recommendationFactory from '../recommendationFactory/recommendationFactory'
 
 describe('testando a função insert', () => {
   it('testando sem conflito', async () => {
-    const recommendation = {
-      name: 'teste',
-      youtubeLink: 'https://google.com'
-    }
+    const recommendation = recommendationFactory()
 
     jest
       .spyOn(recommendationRepository, 'findByName')
@@ -21,18 +20,10 @@ describe('testando a função insert', () => {
     expect(recommendationRepository.create).toBeCalled()
   })
 
-  it('testando com conflito', async () => {
-    const recommendation = {
-      name: 'teste',
-      youtubeLink: 'https://google.com'
-    }
+  it('testando com conflito', () => {
+    const recommendation = recommendationFactory()
 
-    const findRecommendation = {
-      id: 1,
-      name: 'teste',
-      youtubeLink: 'https://google.com',
-      score: 0
-    }
+    const findRecommendation = findRecommendationFactory()
 
     jest
       .spyOn(recommendationRepository, 'findByName')
@@ -44,5 +35,37 @@ describe('testando a função insert', () => {
       type: 'conflict',
       message: 'Recommendations names must be unique'
     })
+  })
+})
+
+describe('testando a função upvote', () => {
+  it('testando com id existente', async () => {
+    const id = 1
+
+    const findRecommendation = findRecommendationFactory()
+
+    jest
+      .spyOn(recommendationRepository, 'find')
+      .mockResolvedValueOnce(findRecommendation)
+
+    jest
+      .spyOn(recommendationRepository, 'updateScore')
+      .mockResolvedValueOnce(null)
+
+    await recommendationService.upvote(id)
+
+    expect(recommendationRepository.find).toBeCalled()
+
+    expect(recommendationRepository.updateScore).toBeCalled()
+  })
+
+  it('testando com id inexistente', () => {
+    const id = 1
+
+    jest.spyOn(recommendationRepository, 'find').mockResolvedValueOnce(null)
+
+    const promise = recommendationService.upvote(id)
+
+    expect(promise).rejects.toEqual({ type: 'not_found', message: '' })
   })
 })
