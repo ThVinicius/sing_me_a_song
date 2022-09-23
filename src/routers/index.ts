@@ -9,6 +9,6 @@ const route = Router()
 
 route.use('/recommendations', recommendationRouter)
 
-if (process.env.NODE_ENV === 'TEST') route.use(testsRouter)
+if (process.env.NODE_ENV === 'TEST') route.use('/tests', testsRouter)
 
 export default route
