@@ -141,3 +141,19 @@ describe('testes da função get', () => {
     expect(result).toEqual(findRecommendation)
   })
 })
+
+describe('testes da função getTop', () => {
+  it('testa o retorno dela', async () => {
+    const amount = 10
+
+    const findRecommendation = [findRecommendationFactory()]
+
+    jest
+      .spyOn(recommendationRepository, 'getAmountByScore')
+      .mockResolvedValueOnce(findRecommendation)
+
+    const result = await recommendationService.getTop(amount)
+
+    expect(result).toEqual(findRecommendation)
+  })
+})
