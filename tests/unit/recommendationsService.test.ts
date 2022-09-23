@@ -127,3 +127,17 @@ describe('testando a função downvote', () => {
     expect(recommendationRepository.remove).toBeCalled()
   })
 })
+
+describe('testes da função get', () => {
+  it('testa o retorno dela', async () => {
+    const findRecommendation = [findRecommendationFactory()]
+
+    jest
+      .spyOn(recommendationRepository, 'findAll')
+      .mockResolvedValueOnce(findRecommendation)
+
+    const result = await recommendationService.get()
+
+    expect(result).toEqual(findRecommendation)
+  })
+})
