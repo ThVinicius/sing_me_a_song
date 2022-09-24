@@ -191,6 +191,30 @@ describe('GET /recommendations/:id', () => {
   })
 })
 
+describe('GET /recommendations/random', () => {
+  it('testa o retorno caso haja uma recomendação no banco', async () => {
+    const data = recommendationFactory()
+
+    await agent.post('/recommendations').send(data)
+
+    const recommendation = await prisma.recommendation.findUnique({
+      where: { name: data.name }
+    })
+
+    const random = await agent.get('/recommendations/random')
+
+    expect(random.status).toEqual(200)
+
+    expect(random.body).toEqual(recommendation)
+  })
+
+  it('testa o retorno caso não haja recomendações no banco', async () => {
+    const random = await agent.get('/recommendations/random')
+
+    expect(random.status).toEqual(404)
+  })
+})
+
 describe('GET /recommendations/top/:amount', () => {
   it('busca top 3', async () => {
     const data = top5Factory()
