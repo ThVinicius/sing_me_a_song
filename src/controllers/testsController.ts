@@ -15,4 +15,10 @@ async function getRecommendationByName(req: Request, res: Response) {
   return res.status(200).send({ recommendation })
 }
 
-export default { resetDatabase, getRecommendationByName }
+async function createTopTen(_: Request, res: Response) {
+  const recommendations = await testsService.createTopTen()
+
+  return res.status(201).send(recommendations)
+}
+
+export default { resetDatabase, getRecommendationByName, createTopTen }

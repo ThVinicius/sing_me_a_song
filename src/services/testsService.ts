@@ -8,4 +8,8 @@ function getRecommendationByName(name: string) {
   return testsRepository.getRecommendationByName(name)
 }
 
-export default { resetDatabase, getRecommendationByName }
+function createTopTen() {
+  return testsRepository.createTopTen()
+}
+
+export default { resetDatabase, getRecommendationByName, createTopTen }
