@@ -12,7 +12,7 @@ async function getRecommendationByName(req: Request, res: Response) {
 
   const recommendation = await testsService.getRecommendationByName(name)
 
-  return res.status(200).send(recommendation)
+  return res.status(200).send({ recommendation })
 }
 
 export default { resetDatabase, getRecommendationByName }
