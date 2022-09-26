@@ -3,7 +3,7 @@
 In this project I was given the task of doing the unit tests, integration and e2e
 
 <p align="center">
-  <img  src="https://pics.freeicons.io/uploads/icons/png/15441243016354192294521-512.png">
+  <img  src="https://cdn-icons-png.flaticon.com/512/3208/3208679.png">
 </p>
 <h1 align="center">
   Sing me a song
